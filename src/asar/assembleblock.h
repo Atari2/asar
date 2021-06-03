@@ -31,6 +31,19 @@ struct whiletracker {
 
 extern autoarray<whiletracker> whilestatus;
 
+constexpr uint8_t bitwidth_unspecified = 0;
+constexpr uint8_t bitwidth_eight_a = (1 << 1);
+constexpr uint8_t bitwidth_sixteen_a = (1 << 2);
+constexpr uint8_t bitwidth_eight_xy = (1 << 3);
+constexpr uint8_t bitwidth_sixteen_xy = (1 << 4);
+constexpr uint8_t bitwidth_mask(uint8_t val, uint8_t mask) {
+	return val & (~mask);
+}
+
+extern uint8_t bitwidth;
+
+bool check_immediate_bitwidth_a(int len);
+bool check_immediate_bitwidth_xy(int len);
 bool confirmname(const char * name);
 string posneglabelname(const char ** input, bool define);
 

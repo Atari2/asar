@@ -24,6 +24,7 @@ int realstartpos;
 bool emulatexkas;
 bool mapper_set = false;
 bool warn_endwhile = true;
+uint8_t bitwidth = bitwidth_unspecified;
 static bool specifiedasarver = false;
 
 static int old_snespos;
@@ -173,6 +174,26 @@ inline void write1_65816(unsigned int num)
 void write1_pick(unsigned int num)
 {
 	write1_65816(num);
+}
+
+bool check_immediate_bitwidth_a(int len) {
+	if (bitwidth == bitwidth_unspecified)
+		return true;
+	if ((bitwidth & (bitwidth_eight_a | bitwidth_sixteen_a)) == 0)
+		return true;
+	if ((len == 2 && (bitwidth & bitwidth_sixteen_a) != 0) || (len == 1 && (bitwidth & bitwidth_eight_a) != 0))
+		return true;
+	return false;
+}
+
+bool check_immediate_bitwidth_xy(int len) {
+	if (bitwidth == bitwidth_unspecified)
+		return true;
+	if ((bitwidth & (bitwidth_eight_xy | bitwidth_sixteen_xy)) == 0)
+		return true;
+	if ((len == 2 && (bitwidth & bitwidth_sixteen_xy) != 0) || (len == 1 && (bitwidth & bitwidth_eight_xy) != 0))
+		return true;
+	return false;
 }
 
 static bool asblock_pick(char** word, int numwords)
@@ -650,6 +671,7 @@ void initstuff()
 	arch=arch_65816;
 	mapper=lorom;
 	mapper_set = false;
+	bitwidth = bitwidth_unspecified;
 	reallycalledmacros=0;
 	calledmacros=0;
 	macrorecursion=0;
@@ -2285,6 +2307,37 @@ void assembleblock(const char * block, bool isspecialline)
 		//if (emulatexkas) warn0("Convert the patch to native Asar format instead of making an Asar-only xkas patch.");
 		//if (mapper==lorom || mapper==hirom) fastrom=true;
 		//else error(0, "Can't use fastrom in this mapper.");
+	}
+	else if (is1("bitwidth") || is2("bitwidth"))
+	{
+		if (numwords == 2) {
+			if (!stricmp(word[1], "8"))
+				bitwidth = bitwidth_eight_a | bitwidth_eight_xy;
+			else if (!stricmp(word[1], "16"))
+				bitwidth = bitwidth_sixteen_a | bitwidth_sixteen_xy;
+			else if (!stricmp(word[1], "off"))
+				bitwidth = bitwidth_unspecified;
+			else asar_throw_error(0, error_type_block, error_id_invalid_bitwidth);
+		}
+		else {
+			if (!stricmp(word[1], "a")) {
+				if (!stricmp(word[2], "8"))
+					bitwidth = bitwidth_mask(bitwidth, bitwidth_sixteen_a) | bitwidth_eight_a;
+				else if (!stricmp(word[2], "16"))
+					bitwidth = bitwidth_mask(bitwidth, bitwidth_eight_a) | bitwidth_sixteen_a;
+				else if (!stricmp(word[2], "off"))
+					bitwidth = bitwidth_mask(bitwidth, bitwidth_eight_a | bitwidth_sixteen_a);
+			}
+			else if (!stricmp(word[1], "xy")) {
+				if (!stricmp(word[2], "8"))
+					bitwidth = bitwidth_mask(bitwidth, bitwidth_sixteen_xy) | bitwidth_eight_xy;
+				else if (!stricmp(word[2], "16"))
+					bitwidth = bitwidth_mask(bitwidth, bitwidth_eight_xy) | bitwidth_sixteen_xy;
+				else if (!stricmp(word[2], "off"))
+					bitwidth = bitwidth_mask(bitwidth, bitwidth_eight_xy | bitwidth_sixteen_xy);
+			}
+			else asar_throw_error(0, error_type_block, error_id_invalid_bitwidth);
+		}
 	}
 	else if (is0("{") || is0("}")) {}
 	else

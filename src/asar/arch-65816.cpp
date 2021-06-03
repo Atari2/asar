@@ -43,9 +43,9 @@ bool asblock_65816(char** word, int numwords)
 #define as3(    op, byte) if (is(op) && len==3) { write1((unsigned int)byte); write3(num); return true; }
 //#define as23(   op, byte) if (is(op) && (len==2 || len==3)) { write1(byte); write2(num); return true; }
 #define as32(   op, byte) if (is(op) && ((len==2 && !explicitlen) || len==3)) { write1((unsigned int)byte); write3(num); return true; }
-#define as_a(   op, byte) if (is(op)) { if(!explicitlen && !hexconstant) asar_throw_warning(0, warning_id_implicitly_sized_immediate); if (len==1) { write1(byte); write1(num); } \
+#define as_a(   op, byte) if (is(op)) { if(!explicitlen && !hexconstant) asar_throw_warning(0, warning_id_implicitly_sized_immediate); if (!check_immediate_bitwidth_a(len)) 	asar_throw_warning(0, warning_id_specific_bitwidth_not_match, (bitwidth & bitwidth_eight_a) ? 8 : 16, 8 * len); if (len==1) { write1(byte); write1(num); } \
 																					 else { write1((unsigned int)byte); write2(num); } return true; }
-#define as_xy(  op, byte) if (is(op)) { if(!explicitlen && !hexconstant) asar_throw_warning(0, warning_id_implicitly_sized_immediate); if (len==1) { write1(byte); write1(num); } \
+#define as_xy(  op, byte) if (is(op)) { if(!explicitlen && !hexconstant) asar_throw_warning(0, warning_id_implicitly_sized_immediate); if (!check_immediate_bitwidth_xy(len)) 	asar_throw_warning(0, warning_id_specific_bitwidth_not_match, (bitwidth & (bitwidth_eight_xy | bitwidth_sixteen_xy)), 8 * len); if (len==1) { write1(byte); write1(num); } \
 																					 else {  write1((unsigned int)byte); write2(num); } return true; }
 #define as_rep( op, byte) if (is(op)) { if (pass==0) { num=getnum(par); } if(foundlabel) asar_throw_error(0, error_type_block, error_id_no_labels_here); for (unsigned int i=0;i<num;i++) { write1((unsigned int)byte); } return true; }
 #define as_rel1(op, byte) if (is(op)) { int pos=(!foundlabel)?(int)num:(int)num-((snespos&0xFFFFFF)+2); write1((unsigned int)byte); write1((unsigned int)pos); \

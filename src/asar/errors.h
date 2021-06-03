@@ -237,6 +237,7 @@ enum asar_error_id : int
 
 	error_id_spc700_addr_out_of_range,
 	error_id_label_ambiguous,
+	error_id_invalid_bitwidth,
 	
 	error_id_end,
 	error_id_count = error_id_end - error_id_start - 1,

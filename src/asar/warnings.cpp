@@ -86,7 +86,8 @@ static asar_warning_mapping asar_warnings[] =
 	{ WRN(datasize_exceeds_size), "Datasize exceeds 0xFFFF for label '%s'." },
 	
 	{ WRN(mapper_already_set), "A mapper has already been selected." },
-	{ WRN(feature_deprecated), "DEPRECATION NOTIFICATION: Feature %s is deprecated and will be REMOVED in the future. Please update your code to conform to newer styles. Suggested work around: %s." }
+	{ WRN(feature_deprecated), "DEPRECATION NOTIFICATION: Feature %s is deprecated and will be REMOVED in the future. Please update your code to conform to newer styles. Suggested work around: %s." },
+	{ WRN(specific_bitwidth_not_match), "Specified bitwidth was %d-bit but used bitwidth was %d-bit."}
 };
 
 // RPG Hacker: Sanity check. This makes sure that the element count of asar_warnings
